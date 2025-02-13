@@ -1,0 +1,46 @@
+name: DPy Action
+description: Analyzes the newly commited code, detects comprehensive set of code smells, and archives the results.
+branding:
+  color: "orange"
+  icon: "arrow-up-right"
+inputs:
+  PAT:
+    description: "Personal access token"
+    default: "No PAT provided"
+  D_KEY:
+    description: "Designite license key - optional"
+    default: "No key"
+  OS:
+    description: "Operating System of the runner to choose the appropriate DPy binary"
+    default: "linux"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download DPy
+      run: |
+        if [[ "${{inputs.OS}}" == "linux" ]]; then
+        wget "https://www.designite-tools.com/assets/DPy-linux.zip"
+        fi
+        if [[ "${{inputs.OS}}" == "windows" ]]; then
+        wget "https://www.designite-tools.com/assets/DPy-windows.zip"
+        fi
+        if [[ "${{inputs.OS}}" == "mac" ]]; then
+        wget "https://www.designite-tools.com/assets/DPy-macos.zip"
+        fi
+        unzip DPy.zip
+      shell: bash
+    - name: Analyze project with DPy
+      run: |
+        DPY_CMD=$([[ "${{inputs.OS}}" == "windows" ]] && echo "DPy.exe" || echo "./DPy")
+        BASE_CMD="$DPY_CMD analyze -ci -repo $GITHUB_REPOSITORY -pat ${{ inputs.PAT }} -o dpy-output"
+        if [[ "${{inputs.D_KEY}}" != "No key" ]]; then
+          BASE_CMD+=" -k ${{ inputs.D_KEY }}"
+        fi
+        $BASE_CMD
+      shell: bash
+    - name: Archive Designite results
+      uses: actions/upload-artifact@v3
+      with:
+        name: dpy-output-${{ github.sha }}
+        path: "dpy-output"
