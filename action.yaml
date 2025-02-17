@@ -13,6 +13,9 @@ inputs:
   OS:
     description: "Operating System of the runner to choose the appropriate DPy binary"
     default: "linux"
+  BRANCH:
+    description: "Branch to analyze - optional"
+    default: "main"
 
 runs:
   using: "composite"
@@ -33,14 +36,14 @@ runs:
     - name: Analyze project with DPy
       run: |
         DPY_CMD=$([[ "${{inputs.OS}}" == "windows" ]] && echo "DPy.exe" || echo "./DPy")
-        BASE_CMD="$DPY_CMD analyze -ci -repo $GITHUB_REPOSITORY -pat ${{ inputs.PAT }} -o dpy-output"
+        BASE_CMD="$DPY_CMD analyze-in-ci -repo ${{ github.server_url }}/${{ github.repository }}.git -pat ${{ inputs.PAT }} -o dpy-output" -b ${{ inputs.BRANCH }}
         if [[ "${{inputs.D_KEY}}" != "No key" ]]; then
           BASE_CMD+=" -k ${{ inputs.D_KEY }}"
         fi
         $BASE_CMD
       shell: bash
     - name: Archive Designite results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dpy-output-${{ github.sha }}
         path: "dpy-output"
