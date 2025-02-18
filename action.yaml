@@ -24,14 +24,16 @@ runs:
       run: |
         if [[ "${{inputs.OS}}" == "linux" ]]; then
         wget "https://www.designite-tools.com/assets/DPy-linux.zip"
+        unzip DPy-linux.zip
         fi
         if [[ "${{inputs.OS}}" == "windows" ]]; then
         wget "https://www.designite-tools.com/assets/DPy-windows.zip"
+        unzip DPy-windows.zip
         fi
         if [[ "${{inputs.OS}}" == "mac" ]]; then
         wget "https://www.designite-tools.com/assets/DPy-macos.zip"
+        unzip DPy-macos.zip
         fi
-        unzip DPy.zip
       shell: bash
     - name: Analyze project with DPy
       run: |
