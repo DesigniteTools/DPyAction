@@ -42,6 +42,7 @@ runs:
         if [[ "${{inputs.D_KEY}}" != "No key" ]]; then
           BASE_CMD+=" -k ${{ inputs.D_KEY }}"
         fi
+        echo $BASE_CMD
         $BASE_CMD
       shell: bash
     - name: Archive Designite results
