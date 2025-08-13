@@ -19,6 +19,12 @@ inputs:
   FORMAT:
     description: "Output format - optional"
     default: "csv"
+  API_KEY:
+    description: "DCode API key for authentication"
+    required: false
+  PROJECT_ID:
+    description: "DCode project ID"
+    required: false
 runs:
   using: "composite"
   steps:
@@ -52,3 +58,28 @@ runs:
       with:
         name: designite-output-${{ github.sha }}
         path: "designite-output"
+    - name: Store analysis results on DCode platform, if configured
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.API_KEY }}" ]; then
+          echo "DCode API key is configured. Uploading the analysis results on DCode..."
+          # Build -F arguments with numbered keys file1, file2, ...
+          form_args=()
+          counter=1
+          for file in designite-output/*; do
+            if [ -f "$file" ]; then
+              form_args+=(-F "file${counter}=@${file}")
+              counter=$((counter + 1))
+            fi
+          done
+          if [ ${#form_args[@]} -eq 0 ]; then
+            echo "No files found in folder designite-output."
+            exit 1
+          fi
+          curl -s -H "X-API-Key: ${{ inputs.api-key }}" \
+               -H "X-Commit-ID: ${{ github.sha }}" \
+                "${form_args[@]}" \
+               https://dcodehub.com/api/projects/"${{ inputs.PROJECT_ID }}"/upload/
+        else
+          echo "DCode API key not set. Skipping uploading analysis results to DCode."
+        fi
