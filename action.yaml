@@ -79,7 +79,6 @@ runs:
           # Build curl command (array to handle spaces safely)
           curl_cmd=("curl" "-s" "-o" "/tmp/curl_output" "-w" "%{http_code}" "-X" "POST" "-H" "X-API-Key: ${{ inputs.api-key }}" "-H" "X-Commit-ID: ${{ github.sha }}" "${form_args[@]}" "https://dcodehub.com/api/projects/${{ inputs.PROJECT_ID }}/upload/")
           safe_cmd=("${curl_cmd[@]}")
-          safe_cmd[8]="X-API-Key: *****"
           echo "Executing: ${safe_cmd[*]}"
           http_status=$("${curl_cmd[@]}")
           echo "HTTP status code: $http_status"
