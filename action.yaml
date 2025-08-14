@@ -80,6 +80,13 @@ runs:
                -H "X-Commit-ID: ${{ github.sha }}" \
                 "${form_args[@]}" \
                https://dcodehub.com/api/projects/"${{ inputs.PROJECT_ID }}"/upload/
+          curl_cmd=("curl" "-s" "-X" "POST" "-H" "X-API-Key: ${{ inputs.api-key }}" "-H" "X-Commit-ID: ${{ github.sha }}" "${form_args[@]}" "https://dcodehub.com/api/projects/${{ inputs.PROJECT_ID }}/upload/")
+          echo "Executing: ${curl_cmd}"
+          http_status=$("${curl_cmd[@]}")
+          echo "HTTP status code: $http_status"
+
+          echo "API response:"
+          cat /tmp/curl_output
         else
           echo "DCode API key not set. Skipping uploading analysis results to DCode."
         fi
