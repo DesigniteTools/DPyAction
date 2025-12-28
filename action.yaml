@@ -46,7 +46,7 @@ runs:
     - name: Analyze project with DPy
       run: |
         DPY_CMD=$([[ "${{inputs.OS}}" == "windows" ]] && echo "DPy.exe" || echo "./DPy")
-        BASE_CMD="$DPY_CMD analyze-in-ci -repo ${{ github.server_url }}/${{ github.repository }}.git -pat ${{ inputs.PAT }} -o designite-output -b ${{ inputs.BRANCH }} -f ${{ inputs.FORMAT }}"
+        BASE_CMD="$DPY_CMD analyze-in-ci -repo ${{ github.server_url }}/${{ github.repository }}.git -pat ${{ inputs.PAT }} -o designite-output -g -b ${{ inputs.BRANCH }} -f ${{ inputs.FORMAT }}"
         if [[ "${{inputs.D_KEY}}" != "No key" ]]; then
           BASE_CMD+=" -k ${{ inputs.D_KEY }}"
         fi
